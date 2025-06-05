@@ -1,0 +1,28 @@
+#controls {
+    margin: 10px;
+}
+
+canvas {
+    border: 1px solid #000;
+    box-sizing: content-box;
+    touch-action: none;
+}
+
+button {
+    all: unset;
+    cursor: pointer;
+    border: 2px gray solid;
+    padding: 0.5em;
+}
+
+button[aria-pressed='false'] {
+    background-color: tomato;
+}
+
+button[aria-pressed='true'] {
+    background-color: mediumseagreen;
+}
+
+#Bucket-fillPercentage {
+    vertical-align: middle;
+}
