@@ -22,6 +22,7 @@ $defaultColor = '#0073a6' ?>
 <div class="divs" style="margin-top:0!important">
     <h1><a href=".">ANT.ractoc.com Canvas</a> (Work in progress)</h1>
     <div id=main role=none>
+        <p>this canvas works. but its still very much work in progress
         <div id=controls>
             <label for=label-colorPicker>Select Color:</label>
             <color-picker
