@@ -1,10 +1,9 @@
-<?php header('content-type: text/javascript');
-$defaultColor = '#0073a6';
-if (array_key_exists('defaultColor', $_GET)) {
-    if (preg_match('/^#?[a-f0-9]{6}$/iD', "{$_GET['defaultColor']}")) {
-        $defaultColor = preg_replace('/^#?/i', '', "{$_GET['defaultColor']}");
-    }
-} ?>
+// &lt;?php //header('content-type: text/javascript');
+// $defaultColor = '#0073a6';
+// if (array_key_exists('defaultColor', $_GET)) {
+//    if (preg_match('/^#?[a-f0-9]{6}$/iD', "{$_GET['defaultColor']}")) {
+// $defaultColor = preg_replace('/^#?/i', '', "{$_GET['defaultColor']}");
+// }} ?>
 let bucketFillActivated = false, antiAliasing = false;
 
 function bucketFillUpdate(self) {
@@ -137,6 +136,7 @@ function hexToRgb(hex) {
         b: parseInt(result[3], 16)
     } : null;
 }
+
 //
 function downloadBlob(blob, filename) {
     // Create a temporary anchor element
@@ -175,7 +175,7 @@ const canvas = document.getElementById('drawingCanvas'),
     colorPicker = document.getElementById('colorPicker'),
     bucketFillButton = document.getElementById('bucketFillButton'),
     Bucket_fillPercentage = document.getElementById('Bucket-fillPercentage'),
-    canvasComputedStyle = window.getComputedStyle(canvas),
+    // canvasComputedStyle = window.getComputedStyle(canvas),
     ctx = canvas.getContext('2d'), context = ctx;
 Bucket_fillPercentage.value = '20';
 ctx.imageSmoothingEnabled = antiAliasing;
@@ -204,7 +204,6 @@ const updateColor = function () {
     return [Number(canvas.width), Number(canvas.height)];
 };
 colorPicker.addEventListener('newColorSelected', updateColor);
-updateColor.call({value: "<?= "$defaultColor" ?>"});
 
 // Start drawing
 function startDrawing(e) {

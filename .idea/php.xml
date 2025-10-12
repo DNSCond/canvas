@@ -2,11 +2,16 @@
 <project version="4">
   <component name="PhpIncludePathManager">
     <include_path>
-      <path value="D:/var/www/BOTs/dollmaker1" />
-      <path value="D:/var/www/BOTs/accounts" />
-      <path value="D:/var/www/BOTs/DateApi" />
-      <path value="D:/var/www/BOTs/home" />
-      <path value="D:/var/www/BOTs/modulesphp" />
+      <path value="$PROJECT_DIR$/../dollmaker1" />
+      <path value="$PROJECT_DIR$/../accounts" />
+      <path value="$PROJECT_DIR$/../DateApi" />
+      <path value="$PROJECT_DIR$/../home" />
+      <path value="$PROJECT_DIR$/../modulesphp" />
+      <path value="$PROJECT_DIR$/../../dollmaker1" />
+      <path value="$PROJECT_DIR$/../../accounts" />
+      <path value="$PROJECT_DIR$/../../DateApi" />
+      <path value="$PROJECT_DIR$/../../home" />
+      <path value="$PROJECT_DIR$/../../modulesphp" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="8.3" />
