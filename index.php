@@ -44,7 +44,24 @@ $defaultColor = '#0073a6' ?>
             <input id="Bucket-fillPercentage" min=0 max=100 step=0 type=range>
         </div>
         <canvas id=drawingCanvas></canvas>
-        <script type=module>import "./colorPicker2.js"</script>
+        <script type=module>
+            import {html_color_names} from "./html_color_names.js";
+            import "./colorPicker2.js";
+
+            {
+                const colorPicker = document.getElementById('colorPicker');
+                const array = [], proto = {
+                    get [Symbol.toStringTag]() {
+                        return `Color(${this.name}=${this.color})`;
+                    },
+                };
+                for (let [name, color] of Object.entries(html_color_names.samecase)) {
+                    array.push({color, name, __proto__: proto});
+                }
+                console.log(array.join().replaceAll(/,/g, ',\n'));
+                colorPicker.setSwatches(array);
+            }
+        </script>
         <script src=app.js defer></script>
         <script src="<?= 'data:text/javascript;charset=UTF-8;base64,' . base64_encode("window.domContentLoadedPromise.then(function(){updateColor.call({value:'$defaultColor'})});") ?>"></script>
     </div>

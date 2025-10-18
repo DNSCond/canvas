@@ -10,6 +10,7 @@ export class ColorPicker2 extends HTMLElement {
         super();
         this.#internals = this.attachInternals();
         const outerHTML = document.createElement('div');
+        const labelFor_ = document.createElement('label');
         const button = document.createElement('button');
         const textInput = document.createElement('input');
         const subkit = document.createElement('button');
@@ -19,23 +20,27 @@ export class ColorPicker2 extends HTMLElement {
             backgroundColor: '#ffffff',
             position: 'absolute', display: 'none',
             border: '2px solid black',
-            width: '10em',
             height: '25em',
+            width: '13em',
             top: '2em',
             left: '0',
         });
         const selected = document.createElement('div');
         selected.className = 'selected';
         Object.assign(selected.style, {
-            width: '100%',
-            height: '4em',
+            width: '100%', // height: '4em',
         });
         outerHTML.append(selected);
-        selected.append(textInput);
+        selected.append(labelFor_);
         selected.append(Object.assign(subkit, {
             innerText: 'change color',
             className: 'subkit',
         }));
+        Object.assign(labelFor_.style, {
+            backgroundColor: '#000000',
+            color: '#fFffFf',
+        });
+        labelFor_.append('Select color: ', textInput);
         textInput.size = 7;
         textInput.value = '#000000';
         textInput.pattern = /^#?[\da-fA-F]{6}$/.source;
@@ -52,20 +57,33 @@ export class ColorPicker2 extends HTMLElement {
         } button[data-value] {
             font-family: monospace;
             display: block;
-            width: 3em;
-            height:3em;
-            aspect-ratio: 1/1;
+            width: 92%;
+            margin:0.2em;
             border:1px solid black;
             box-sizing: border-box;
-        }:host{position: relative;}`.replaceAll(/\s+/g, ' ');
+        }.outerSpan.colorname {
+            /*width:100%;*/
+            padding: 2px 0 2em 0;
+            display: inline-block;
+        }.innerSpan.colorname {
+            background-color: black; padding: 3px;
+            display: inline-block; color: white;
+        }:host{position: relative;
+        }:host *{overflow-x:hidden}`.replaceAll(/\s+/g, ' ');
         Object.assign(swatches.style, {
-            display: 'flex',
-            flexWrap: 'wrap',
+            // display: 'grid',
+            // flexWrap: 'wrap',
             overflowY: 'auto',
-            height: 'calc(100% - 4em)',
+            height: 'calc(100% - 4.5em)',
+            // gridTemplateColumns: '3em 3em 3em',
+            paddingRight: '0.3em',
+            paddingLeft: '0.3em',
+            paddingTop: '0.5em',
+            gap: '1em',
         });
         swatches.className = 'displayFlex';
         outerHTML.append(swatches);
+        // swatches.role = 'grid';
     }
     connectedCallback() {
         this.abortController?.abort();
@@ -84,12 +102,15 @@ export class ColorPicker2 extends HTMLElement {
                 this.dataset.open = 'true';
                 goOpen = true;
             }
-            if (goOpen)
+            if (goOpen) {
                 div.style.display = 'block';
-            else
+                input.focus();
+            }
+            else {
                 div.style.display = 'none';
+                button.focus();
+            }
         }, { signal });
-        button.setAttribute('tabindex', '0');
         this.swatch();
         this.addEventListener('newColorSelected', function (event) {
             const color = event.detail.value;
@@ -107,8 +128,9 @@ export class ColorPicker2 extends HTMLElement {
     }
     disconnectedCallback() {
         this.abortController?.abort();
-        if (this.shadowRoot)
+        if (this.shadowRoot) {
             this.shadowRoot.innerHTML = '';
+        }
     }
     attributeChangedCallback(_name, oldValue, newValue) {
         if (oldValue === newValue)
@@ -117,7 +139,7 @@ export class ColorPicker2 extends HTMLElement {
     }
     swatch() {
         const flex = this.shadowRoot.querySelector('div.displayFlex');
-        const swatches = this.getSwatches(), self = this;
+        const swatches = this.getSwatchesV2(), self = this;
         const { signal } = this.abortController ?? { signal: null };
         if (!flex || !signal)
             return;
@@ -129,29 +151,47 @@ export class ColorPicker2 extends HTMLElement {
             button.addEventListener('click', function () {
                 self.value = button.dataset.value ?? null;
             }, { signal });
-            button.dataset.value = swatch;
-            button.style.backgroundColor = swatch;
-            // button.innerText = swatch;
+            button.dataset.value = swatch.color;
+            button.style.backgroundColor = swatch.color;
+            button.ariaLabel = `select ${swatch.name} with color ${swatch.color}`;
+            button.tabIndex = 0;
+            {
+                const outerSpan = document.createElement('span');
+                //Object.assign(outerSpan.style, {padding: '2px 2em 2em 2px', display: 'inline-block'});
+                const innerSpan = document.createElement('span');
+                innerSpan.innerText = `${swatch.name} (${swatch.color})`;
+                outerSpan.append(innerSpan);
+                outerSpan.className = 'outerSpan colorname';
+                innerSpan.className = 'innerSpan colorname';
+                // Object.assign(innerSpan.style, {
+                //     backgroundColor: 'black',
+                //     display: 'inline-block',
+                //     color: 'white',
+                // });
+                button.append(outerSpan);
+            }
             return button;
         }));
         return this;
     }
-    getSwatches() {
-        const swatches = this.getAttribute('swatches')?.split(/;/);
-        if (swatches === undefined)
+    getSwatchesV2() {
+        const swatches = this.getAttribute('swatches');
+        if (swatches === null)
             return null;
-        const colors = swatches.map(string => this.constructor.toColor(string));
-        return colors.map(int => int === false ? null : `#${int.toString(16).padStart(6, "0")}`)
-            .filter(m => m !== null);
+        return parseColorString(swatches);
+    }
+    getSwatches() {
+        return this.getSwatchesV2()?.map(swatch => swatch.color) ?? null;
     }
     setSwatches(swatches) {
-        let a = Array.from(swatches, m => this.constructor.toColor(m));
-        a = a.map(int => int === false ? null : `#${int.toString(16).padStart(6, "0")}`).filter(m => m !== null);
-        a = a.filter(s => /^#?[\da-f]{6}$/i.test(s));
-        const swatchesString = a.map(s => s.startsWith('#') ? s : '#' + s).join(';');
+        if (swatches === null) {
+            this.removeAttribute('swatches');
+            return null;
+        }
+        const swatchesString = serializeColorString(swatches);
         this.setAttribute('swatches', swatchesString);
         this.swatch();
-        return swatchesString.split(/;/);
+        return swatchesString;
     }
     get swatches() {
         return this.getSwatches();
@@ -228,6 +268,10 @@ export class ColorPicker2 extends HTMLElement {
     toString() {
         return this.value;
     }
+    /**
+     * returns a 0xRRGGBB
+     * @param color
+     */
     static toColor(color) {
         if (typeof color === "number")
             return color & 0xFFffFf;
@@ -298,10 +342,46 @@ export class ColorPicker2 extends HTMLElement {
         }
         return false;
     }
+    static toColorString(color) {
+        if (color === false)
+            throw new RangeError('toColorString must accept a valid color');
+        return `#${(+color).toString(16).padStart(6, "0")}`;
+    }
 }
 customElements.define('color-picker2', ColorPicker2);
 const eventProto = {
     get [Symbol.toStringTag]() {
+        //@ts-expect-error
         return `newColorSelected(${this.value})`;
     },
 };
+export function parseColorString(string) {
+    const proto = {
+        get [Symbol.toStringTag]() {
+            // @ts-expect-error (i dont know how to annotate this)
+            return `Color(${this.name}=${this.color})`;
+        },
+    }, regexp = /(#[\da-f]{6})(?:\s*=([^;#]*);?)?/ig, strx = `${string}`.matchAll(regexp);
+    return Array.from(strx, mixed => ({
+        name: mixed[2]?.trim() || mixed[1],
+        color: mixed[1], __proto__: proto,
+    }));
+}
+export function serializeColorString(colors) {
+    const strings = Array.from(colors, mixed => {
+        if (typeof mixed.name?.trim !== 'function') {
+            return null;
+        }
+        const name = mixed.name.trim();
+        if (/^#[\da-f]{6}$/ig.exec(mixed.color) && /^[^#;]*$/ig.exec(name)) {
+            if (name) {
+                return `${mixed.color}=${name}`;
+            }
+            else {
+                return `${mixed.color}`;
+            }
+        }
+        return null;
+    }).filter(mixed => mixed !== null);
+    return strings.join(';');
+}
