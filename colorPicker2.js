@@ -1,4 +1,5 @@
 import { html_color_names } from "./html_color_names.js";
+import { parseColorString, serializeColorString } from "./parseColorString.js";
 export class ColorPicker2 extends HTMLElement {
     #internals;
     static formAssociated = true;
@@ -79,7 +80,7 @@ export class ColorPicker2 extends HTMLElement {
             paddingRight: '0.3em',
             paddingLeft: '0.3em',
             paddingTop: '0.5em',
-            gap: '1em',
+            // gap: '1em',
         });
         swatches.className = 'displayFlex';
         outerHTML.append(swatches);
@@ -143,10 +144,9 @@ export class ColorPicker2 extends HTMLElement {
         const { signal } = this.abortController ?? { signal: null };
         if (!flex || !signal)
             return;
-        flex.innerHTML = '';
         if (swatches === null)
             return;
-        flex.append(...swatches.map(function (swatch) {
+        flex.replaceChildren(...swatches.map(function (swatch) {
             const button = document.createElement('button');
             button.addEventListener('click', function () {
                 self.value = button.dataset.value ?? null;
@@ -355,33 +355,3 @@ const eventProto = {
         return `newColorSelected(${this.value})`;
     },
 };
-export function parseColorString(string) {
-    const proto = {
-        get [Symbol.toStringTag]() {
-            // @ts-expect-error (i dont know how to annotate this)
-            return `Color(${this.name}=${this.color})`;
-        },
-    }, regexp = /(#[\da-f]{6})(?:\s*=([^;#]*);?)?/ig, strx = `${string}`.matchAll(regexp);
-    return Array.from(strx, mixed => ({
-        name: mixed[2]?.trim() || mixed[1],
-        color: mixed[1], __proto__: proto,
-    }));
-}
-export function serializeColorString(colors) {
-    const strings = Array.from(colors, mixed => {
-        if (typeof mixed.name?.trim !== 'function') {
-            return null;
-        }
-        const name = mixed.name.trim();
-        if (/^#[\da-f]{6}$/ig.exec(mixed.color) && /^[^#;]*$/ig.exec(name)) {
-            if (name) {
-                return `${mixed.color}=${name}`;
-            }
-            else {
-                return `${mixed.color}`;
-            }
-        }
-        return null;
-    }).filter(mixed => mixed !== null);
-    return strings.join(';');
-}
