@@ -286,5 +286,5 @@ canvas.addEventListener('mouseout', stopDrawing);
 canvas.addEventListener('touchstart', startDrawing);
 canvas.addEventListener('touchmove', draw);
 canvas.addEventListener('touchend', stopDrawing);
-document.querySelector('link[href^=\'canvasDimesnions.css\']').remove();
+document.querySelector('link[href^=\'canvasDimesnions.css\']')?.remove();
 // window.addEventListener('scroll',function(){});

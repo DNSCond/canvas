@@ -3,6 +3,7 @@ import {parseColorString, serializeColorString} from "./parseColorString.js";
 
 export class ColorPicker2 extends HTMLElement {
     #internals;
+    #uiIsOpen = false;
     static formAssociated = true;
     private abortController: AbortController | undefined;
 
@@ -109,13 +110,7 @@ export class ColorPicker2 extends HTMLElement {
                     this.dataset.open = 'true';
                     goOpen = true;
                 }
-                if (goOpen) {
-                    div.style.display = 'block';
-                    input.focus();
-                } else {
-                    div.style.display = 'none';
-                    button.focus();
-                }
+                self.toggleUI(goOpen);
             }, {signal});
         this.swatch();
         this.addEventListener('newColorSelected', function (event) {
@@ -129,6 +124,49 @@ export class ColorPicker2 extends HTMLElement {
         input.addEventListener('keydown', function (keyevent) {
             if (keyevent.key === 'Enter') self.value = input.value;
         }, {signal});
+        document.addEventListener('click', function (event) {
+            const path = event.composedPath();
+            if (!path.includes(div) && !path.includes(button)) {
+                // clicked outside the div
+                self.closeUI();
+            }
+        }, {signal});
+    }
+
+    openUI() {
+        this.toggleUI(true);
+    }
+
+    closeUI() {
+        this.toggleUI(false);
+    }
+
+    get uiIsOpen() {
+        return this.#uiIsOpen;
+    }
+
+    set uiIsOpen(goOpen: boolean) {
+        this.toggleUI(goOpen);
+    }
+
+    toggleUI(goOpen: boolean): boolean {
+        if (goOpen as unknown === undefined) {
+            throw new TypeError('toggleUI must not receive undefined');
+        }
+        const button: HTMLButtonElement = this.shadowRoot!.querySelector('button.selectionButton')!;
+        const div: HTMLDivElement = this.shadowRoot!.querySelector('div.outerSelection')!;
+        const input: HTMLInputElement = this.shadowRoot!.querySelector('input')!;
+        if (goOpen) {
+            div.style.display = 'block';
+            this.#uiIsOpen = true;
+            input.focus();
+            return true;
+        } else {
+            div.style.display = 'none';
+            this.#uiIsOpen = false;
+            button.focus();
+            return false;
+        }
     }
 
     disconnectedCallback(): void {

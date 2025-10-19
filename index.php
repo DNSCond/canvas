@@ -13,7 +13,6 @@ create_head('The Drawer!', [
     //new ANTNavLinkTag('stylesheet', "stylesheet.css?cache-buster=$cacheBuster"),
     //new ANTNavLinkTag('stylesheet', "canvasDimesnions.css?cache-buster=$cacheBuster"),
     new ANTNavLinkTag('stylesheet', "stylesheet.css"),
-    new ANTNavLinkTag('stylesheet', "canvasDimesnions.css"),
 ], [
     ANTNavHome(),
     ANTNavBuzz('.', 'Canvas', true),
@@ -58,12 +57,12 @@ $defaultColor = '#0073a6' ?>
                 for (let [name, color] of Object.entries(html_color_names.samecase)) {
                     array.push({color, name, __proto__: proto});
                 }
-                console.log(array.join().replaceAll(/,/g, ',\n'));
+                // console.log(array.join().replaceAll(/,/g, ',\n'));
                 colorPicker.setSwatches(array);
             }
         </script>
         <script src=app.js defer></script>
-        <script src="<?= 'data:text/javascript;charset=UTF-8;base64,' . base64_encode("window.domContentLoadedPromise.then(function(){updateColor.call({value:'$defaultColor'})});") ?>"></script>
+        <script src="<?= 'data:text/javascript;charset=UTF-8;base64,' . base64_encode("domContentLoadedPromise.then(function(){updateColor.call({value:'$defaultColor'})});") ?>"></script>
     </div>
     <a href="<?= '/dollmaker1/colors.php' ?>">Colors</a>
 </div>

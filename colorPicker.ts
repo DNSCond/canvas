@@ -1,3 +1,6 @@
+/**
+ * (this file is deprecated)
+ */
 // // colorPicker
 // export class ColorPicker extends HTMLElement {
 //     protected inputElement: HTMLInputElement | undefined;
