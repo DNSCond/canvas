@@ -11,7 +11,6 @@ export class ColorPicker2 extends HTMLElement {
         return ['value', 'swatches'];
     }
 
-
     constructor() {
         super();
         this.#internals = this.attachInternals();
@@ -126,7 +125,7 @@ export class ColorPicker2 extends HTMLElement {
         }, {signal});
         document.addEventListener('click', function (event) {
             const path = event.composedPath();
-            if (!path.includes(div) && !path.includes(button)) {
+            if (!path.includes(div) && !path.includes(button) && self.uiIsOpen) {
                 // clicked outside the div
                 self.closeUI();
             }
@@ -407,3 +406,4 @@ const eventProto = {
         return `newColorSelected(${this.value})`;
     },
 };
+
